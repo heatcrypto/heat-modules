@@ -30,9 +30,21 @@ To run the tests for a single module we CD into that directory `cd modules/modul
 
 To build a single module again CD into that directory `cd modules/module-name` than we run build `npm run build`.
 
+## Bootstrap your module
+
+A bootstrap command is included to generate all the module boilerplate code for you with from a single command.
+
+You only have to provide the name of your module.
+
+Run `npm run bootstrap yourModuleName` to generate your module boilerplate.
+
+Your implementation would go in `modules/moduleName/src/core.js` which has all the most used methods for you declared complete
+with instructions and comments. Now simply replace any one of the `throw Error('Not implemented')` with your own code and run 
+`npm run build` to run the unit tests.
+
 ## Modules
 
-Roughly speaking we would have one module per cryptocurrency platform (that gives us modules named bitcoin, ethereum, ripple, iota, heat, eos etc..).
+Roughly speaking there is one module per cryptocurrency platform (that gives us modules named bitcoin, ethereum, ripple, iota, heat, eos etc..).
 
 While not mandated generally speaking each module provides the following high level cryptocurrency operations (in no particular order).
 
