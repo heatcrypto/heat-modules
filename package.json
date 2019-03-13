@@ -8,7 +8,7 @@
     "build": "subpkg run build"
   },
   "author": "dennis@heatledger.com",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "devDependencies": {
     "browserify": "^16.2.3",
     "del": "^3.0.0",
