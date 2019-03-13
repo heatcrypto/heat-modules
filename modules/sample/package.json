@@ -1,0 +1,14 @@
+{
+  "name": "sample",
+  "version": "1.0.0",
+  "description": "sample blockchain protocol operations",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && karma start ./karma.conf.js --single-run"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
+}

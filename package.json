@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "subpkg install",
-    "build": "subpkg run build"
+    "build": "subpkg run build",
+    "bootstrap": "node bootstrap.js"
   },
   "author": "dennis@heatledger.com",
   "license": "MIT",
