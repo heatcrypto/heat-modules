@@ -32,7 +32,7 @@ To build a single module again CD into that directory `cd modules/module-name` t
 
 ## Bootstrap your module
 
-A bootstrap command is included to generate all the module boilerplate code for you with from a single command.
+A bootstrap command is included to generate all the module boilerplate code for you from a single command.
 
 You only have to provide the name of your module.
 
