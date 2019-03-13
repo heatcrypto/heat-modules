@@ -42,6 +42,9 @@ Your implementation would go in `modules/moduleName/src/core.js` which has all t
 with instructions and comments. Now simply replace any one of the `throw Error('Not implemented')` with your own code and run 
 `npm run build` to run the unit tests.
 
+Please have a look in the `sample` module https://github.com/Heat-Ledger-Ltd/heat-modules/tree/master/modules/sample to see what
+a freshly generated module looks like.
+
 ## Modules
 
 Roughly speaking there is one module per cryptocurrency platform (that gives us modules named bitcoin, ethereum, ripple, iota, heat, eos etc..).
