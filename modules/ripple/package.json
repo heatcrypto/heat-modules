@@ -1,0 +1,19 @@
+{
+  "name": "ripple",
+  "version": "1.0.0",
+  "description": "ripple blockchain protocol operations",
+  "main": "index.js",
+  "scripts": {
+    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js",
+    "test": "karma start ./karma.conf.js --single-run",
+    "dist": "npm run build && npm run test",
+    "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' karma start ./karma.conf.js --single-run",
+    "test-transaction": "npm run build && KARMA_SPECS='./test/transaction.spec.js' karma start ./karma.conf.js --single-run"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "ripple-lib": "^1.1.2"
+  }
+}
