@@ -33,7 +33,7 @@ ls modules/ripple
   -> index.js  karma.conf.js  package.json  src  test
 ```
 
-## Implementation
+## Implementation (full Ripple example)
 
 In order to support any blockchain we need to know how to deal with addresses and transactions.
 
