@@ -50,7 +50,7 @@ As with most cryptocurrencies Ripple has an official sdk, lets install that firs
 npm install ripple-lib --save
 ```
 
-Now open the file `./modules/ripple/src/core.js` that was generated for you in the bootstrap step and add the following code
+Now open the file [`./modules/ripple/src/core.js`](https://github.com/Heat-Ledger-Ltd/heat-modules/blob/master/modules/ripple/src/core.js) that was generated for you in the bootstrap step and add the following code
 so we support Ripple addresses.
 
 ```js
@@ -87,9 +87,9 @@ function isValidAddress(address) {
 
 Thats it! You have just completed implementing address support for Ripple.
 
-Now for the unit tests.. Open the file `./modules/ripple/test/address.spec.js` that was generated for you during the bootstrap step.
+Now for the unit tests.. Open the file [`./modules/ripple/test/address.spec.js`](https://github.com/Heat-Ledger-Ltd/heat-modules/blob/master/modules/ripple/test/address.spec.js) that was generated for you during the bootstrap step.
 
-`address.spec.js` is a [Jasmine](https://jasmine.github.io/) BDD test (visit the Jasmine page to learn more).
+[`address.spec.js`](https://github.com/Heat-Ledger-Ltd/heat-modules/blob/master/modules/ripple/test/address.spec.js) is a [Jasmine](https://jasmine.github.io/) BDD test (visit the Jasmine page to learn more).
 
 The first two `tests` require no input from you and should pass. The third and fourth test we need to provide 
 with some actual valid and invalid addresses and secrets, we did so for you below.
@@ -123,7 +123,7 @@ npm run test-address
 
 Now we add support for sending payments on the Ripple blockchain.
 
-Again open `./modules/ripple/src/core.js` and add the following code to add support for creating payments on the Ripple blockchain.
+Again open [`./modules/ripple/src/core.js`](https://github.com/Heat-Ledger-Ltd/heat-modules/blob/master/modules/ripple/src/core.js) and add the following code to add support for creating payments on the Ripple blockchain.
 
 ```js
 async function createPayment(payment, instructions, secret) {
@@ -144,7 +144,7 @@ order to be able to use most of its features where needed.
 
 Now lets test our payment functionality.
 
-Open the file `./modules/ripple/test/transaction.spec.js` that was generated for you during the bootstrap step. And add the following code.
+Open the file [`./modules/ripple/test/transaction.spec.js`](https://github.com/Heat-Ledger-Ltd/heat-modules/blob/master/modules/ripple/test/transaction.spec.js) that was generated for you during the bootstrap step. And add the following code.
 
 ```js
 describe("Test", function() {
