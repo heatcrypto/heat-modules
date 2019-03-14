@@ -17,171 +17,80 @@ await fs.mkdirs(path.join(__dirname, `modules/${moduleName}/src`))
 await fs.mkdirs(path.join(__dirname, `modules/${moduleName}/test`))
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/src/core.js`), 
-`// ========================================================================================
-// Instructions: 
-//
-//  Please "npm install --save my-lib" and then include as "const myLib = require('my-lib')" 
-//  any external libraries you require for this module.
-//  Now implement the methods below for your target currency.
-//  Some methods require only a method body, others require you to define the parameters for
-//  that method as well depending on the target currency.
-//
-//  Comments about what the code is doing are always welcome!
-//  Please try and include links to documentation on the features you are showcasing.
-//
-// ========================================================================================
+`function generateAddress() {
+  throw new Error('Not implemented')
+}
 
-// Determine if an address is a structurally valid address
+function getAddress(secret) {
+  throw new Error('Not implemented')
+}
+
 function isValidAddress(address) {
   throw new Error('Not implemented')
 }
 
-// Determine if a private key is structurally valid
-function isValidPrivateKey(privateKey) {
-  throw new Error('Not implemented')
-}
-
-// Determine if a seed is an HD seed (as defined by that platform standard)
-function isValidHDSeed(hdSeed) {
-  throw new Error('Not implemented')
-}
-
-// Derive private keys from an HD seed
-function deriveChildKey(hdSeed, index) {
-  throw new Error('Not implemented')
-}
-
-// Derive a public key from a private key
-function privateKeyToPublicKey(privateKey) {
-  throw new Error('Not implemented')
-}
-
-// Derive an address from a public key
-function publicKeyToAddress(publicKey) {
-  throw new Error('Not implemented')
-}
-
-// Derive an address from a private key
-function privateKeyToAddress(privateKey) {
-  throw new Error('Not implemented')
-}
-
-// Generate a private key
-function generatePrivateKey() {
-  throw new Error('Not implemented')
-}
-
-// Generate HD seed
-function generateHDSeed() {
-  throw new Error('Not implemented')
-}
-
-// Generate and sign a payment transaction, please try and return the transaction in a form
-// which is compatible with the standard currency API broadcast or send method
-function generatePaymentTransaction(privateKey, recipient, amount) {
-  throw new Error('Not implemented')
-}
-
-// Inspect a binary payment transaction, should return an object of available properties
-// example: { recipient: "", amount: "", fee: "" }
-function inspectPaymentTransaction(transaction) {
+function createPayment() {
   throw new Error('Not implemented')
 }
 
 module.exports = {
+  generateAddress,
+  getAddress,
   isValidAddress,
-  isValidPrivateKey,
-  isValidHDSeed,
-  deriveChildKey,
-  privateKeyToPublicKey,
-  publicKeyToAddress,
-  privateKeyToAddress,
-  generatePrivateKey,
-  generateHDSeed,
-  generatePaymentTransaction,
-  inspectPaymentTransaction
+  createPayment
 }`)
 
-await writeFile(path.join(__dirname, `modules/${moduleName}/test/test.spec.js`), 
+await writeFile(path.join(__dirname, `modules/${moduleName}/test/address.spec.js`), 
 `describe("Test", function() {
-  const { 
-    isValidAddress,
-    isValidPrivateKey,
-    isValidHDSeed,
-    deriveChildKey,
-    privateKeyToPublicKey,
-    publicKeyToAddress,
-    privateKeyToAddress,
-    generatePrivateKey,
-    generateHDSeed,
-    generatePaymentTransaction,
-    inspectPaymentTransaction
-  } = window.exposer.exposedMethods
+  const { generateAddress, getAddress, isValidAddress } = window.exposer.exposedMethods
+  describe("Address", function () {
+    let addr = generateAddress()
+    it("should support address generation", function () {
+      expect(addr.publicKey).toBeNonEmptyString()
+      expect(addr.secret).toBeNonEmptyString()
+      expect(addr.address).toBeNonEmptyString()
+    })
+    it("should support secret to address", function () {
+      expect(getAddress(addr.secret).publicKey).toBe(addr.publicKey)
+      expect(getAddress(addr.secret).address).toBe(addr.address)
+    })
+    it("should support address validation", function () {
+      expect(isValidAddress('1 2 3')).toBeTrue()
+    })
+    it("should support secret validation", function () {
+      expect(getAddress("1 2 3").address).toBe('4 5 6')
+    })
+  }) 
+})`)
 
-  it("should support 'isValidAddress'", async function () {
-    expect(() => isValidAddress()).toThrowError('Not implemented');
-  })  
-  it("should support 'isValidPrivateKey'", async function () {
-    expect(() => isValidPrivateKey()).toThrowError('Not implemented');
-  })  
-  it("should support 'isValidHDSeed'", async function () {
-    expect(() => isValidHDSeed()).toThrowError('Not implemented');
-  })  
-  it("should support 'deriveChildKey'", async function () {
-    expect(() => deriveChildKey()).toThrowError('Not implemented');
-  })  
-  it("should support 'privateKeyToPublicKey'", async function () {
-    expect(() => privateKeyToPublicKey()).toThrowError('Not implemented');
-  })  
-  it("should support 'publicKeyToAddress'", async function () {
-    expect(() => publicKeyToAddress()).toThrowError('Not implemented');
-  })  
-  it("should support 'privateKeyToAddress'", async function () {
-    expect(() => privateKeyToAddress()).toThrowError('Not implemented');
-  })  
-  it("should support 'generatePrivateKey'", async function () {
-    expect(() => generatePrivateKey()).toThrowError('Not implemented');
-  })  
-  it("should support 'generateHDSeed'", async function () {
-    expect(() => generateHDSeed()).toThrowError('Not implemented');
-  })  
-  it("should support 'generatePaymentTransaction'", async function () {
-    expect(() => generatePaymentTransaction()).toThrowError('Not implemented');
-  })  
-  it("should support 'inspectPaymentTransaction'", async function () {
-    expect(() => inspectPaymentTransaction()).toThrowError('Not implemented');
-  })    
+await writeFile(path.join(__dirname, `modules/${moduleName}/test/transaction.spec.js`), 
+`describe("Test", function() {
+  const { createPayment } = window.exposer.exposedMethods
+  describe("Payment", function () {
+    it("can create payments", async function () {
+      expect(() => createPayment()).toThrowError('Not implemented')
+    })
+  })
 })`)
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/index.js`), 
 `const { expose } = window.exposer = require('../expose')
 const { 
+  generateAddress,
+  getAddress,
   isValidAddress,
-  isValidPrivateKey,
-  isValidHDSeed,
-  deriveChildKey,
-  privateKeyToPublicKey,
-  publicKeyToAddress,
-  privateKeyToAddress,
-  generatePrivateKey,
-  generateHDSeed,
-  generatePaymentTransaction,
-  inspectPaymentTransaction } = require('./src/core')
+  createPayment } = require('./src/core')
 
+expose('generateAddress',generateAddress)
+expose('getAddress',getAddress)
 expose('isValidAddress',isValidAddress)
-expose('isValidPrivateKey',isValidPrivateKey)
-expose('isValidHDSeed',isValidHDSeed)
-expose('deriveChildKey',deriveChildKey)
-expose('privateKeyToPublicKey',privateKeyToPublicKey)
-expose('publicKeyToAddress',publicKeyToAddress)
-expose('privateKeyToAddress',privateKeyToAddress)
-expose('generatePrivateKey',generatePrivateKey)
-expose('generateHDSeed',generateHDSeed)
-expose('generatePaymentTransaction',generatePaymentTransaction)
-expose('inspectPaymentTransaction',inspectPaymentTransaction)`)
+expose('createPayment',createPayment)`)
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/karma.conf.js`), 
-`process.env.CHROME_BIN = require('puppeteer').executablePath()
+`function getSpecs(specList) {
+  return specList ? specList.split(',') : ['./test/*.spec.js'] // whatever your default glob is
+}
+process.env.CHROME_BIN = require('puppeteer').executablePath()
 module.exports = function(config) {
   config.set({
     basePath: '',
@@ -193,9 +102,8 @@ module.exports = function(config) {
     ],  
     files: [
       './bundle.js',
-      './node_modules/lodash/lodash.js',
-      './test/test.spec.js'
-    ],
+      './node_modules/lodash/lodash.js'
+    ].concat(getSpecs(process.env.KARMA_SPECS)),
     reporters: ['progress'],
     port: 9876,
     colors: true,
@@ -213,7 +121,11 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/package.json`),
   "description": "${moduleName} blockchain protocol operations",
   "main": "index.js",
   "scripts": {
-    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && karma start ./karma.conf.js --single-run"
+    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js",
+    "test": "karma start ./karma.conf.js --single-run",
+    "dist": "npm run build && npm run test",
+    "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' karma start ./karma.conf.js --single-run",
+    "test-transaction": "npm run build && KARMA_SPECS='./test/transaction.spec.js' karma start ./karma.conf.js --single-run"
   },
   "author": "",
   "license": "ISC",
