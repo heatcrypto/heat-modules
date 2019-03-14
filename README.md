@@ -54,13 +54,7 @@ Now open the file `./modules/ripple/src/core.js` that was generated for you in t
 so we support Ripple addresses.
 
 ```js
-// at the top we load the Ripple sdk that we just installed
 const RippleAPI = require('ripple-lib').RippleAPI;
-
-// address support is provided through these methods: 
-// - generateAddress
-// - getAddress
-// - isValidAddress
 
 function generateAddress() {
   const api = new RippleAPI()
