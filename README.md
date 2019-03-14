@@ -50,7 +50,8 @@ As with most cryptocurrencies Ripple has an official sdk, lets install that firs
 npm install ripple-lib --save
 ```
 
-Now open the file `./modules/ripple/src/core.js` that was generated for you in the bootstrap step.
+Now open the file `./modules/ripple/src/core.js` that was generated for you in the bootstrap step and add the following code
+so we support Ripple addresses.
 
 ```js
 // at the top we load the Ripple sdk that we just installed
