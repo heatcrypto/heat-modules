@@ -1,78 +1,194 @@
-# HEAT-MODULES
+# Add support for your blockchain
 
-This repo is a collection of individual blockchain protocol implementations.
+Adding support for your blockchain can't get any easier.
 
-Contributions are made by creating or expanding on existing blockchain protocol implementations.
+## Installation
 
-The structure of this repo is devided into modules (see the modules folder) where each module in itself is a node package that 
-comes with its own package.json and its own dependencies in its own node_modules completely isolated from all other modules.
+Follow these steps to get started, in most cases just a few lines of Javascript are needed from you to add support for your blockchain.
 
-Each module is transpiled and run through browserify ending in a single stand alone bundle of javascript code that should run in
-any standard browser.
+Before we start make sure the following dependencies are pre-installed.
 
-Each module also comes with its own tests which make use of Jasmin (BDD tests) and Karma (tests run in a chrome browser) in order to 
-mimic the target environment as best as possible.
+- git
+- nodejs (version 8 or higher)
+- npm (comes with nodejs)
+- [karma](http://karma-runner.github.io/3.0/intro/installation.html) (run `npm install -g karma-cli` to install)
 
-Karma and Jasmin dependencies reside in the project root so these do not have to be installed in each module individualy.
+On the command line run.
 
-## Installation & Usage
+```shell
+# clone the repo
+git clone https://github.com/Heat-Ledger-Ltd/heat-modules.git
 
-Please make sure you have nodejs version 8 or higher and npm installed.
+# cd into the repo
+cd heat-modules
 
-We advice to install karma-cli glbally. `npm install -g karma-cli` some information that could be helpfull can be found here 
-http://karma-runner.github.io/3.0/intro/installation.html
+# install dependencies
+npm install
 
-To install all dependencies for all modules run `npm install`.
+# bootstrap your own empty module (using ripple as an example here)
+npm run bootstrap ripple
 
-To build all modules and run all tests run `npm run build`.
+# et voila, here is your new module
+ls modules/ripple
+  -> index.js  karma.conf.js  package.json  src  test
+```
 
-To run the tests for a single module we CD into that directory `cd modules/module-name` than we run those tests `npm t`.
+## Implementation
 
-To build a single module again CD into that directory `cd modules/module-name` than we run build `npm run build`.
+In order to support any blockchain we need to know how to deal with addresses and transactions.
 
-## Bootstrap your module
+We are going to follow the sample of adding native support for Ripple, similar steps apply for any other blockchain.
 
-A bootstrap command is included to generate all the module boilerplate code for you from a single command.
+    Use `npm run bootstrap-utxo` for utxo based blockchains
 
-You only have to provide the name of your module.
+### Address support
 
-Run `npm run bootstrap yourModuleName` to generate your module boilerplate.
+As with most cryptocurrencies Ripple has an official sdk, lets install that first so we can use that.
 
-Your implementation would go in `modules/moduleName/src/core.js` which has all the most used methods for you declared complete
-with instructions and comments. Now simply replace any one of the `throw Error('Not implemented')` with your own code and run 
-`npm run build` to run the unit tests.
+```bash
+# make sure we are in ./modules/ripple when running this command
+npm install ripple-lib --save
+```
 
-Please have a look in the `sample` module https://github.com/Heat-Ledger-Ltd/heat-modules/tree/master/modules/sample to see what
-a freshly generated module looks like.
+Now open the file `./modules/ripple/src/core.js` that was generated for you in the bootstrap step.
 
-## Modules
+```js
+// at the top we load the Ripple sdk that we just installed
+const RippleAPI = require('ripple-lib').RippleAPI;
 
-Roughly speaking there is one module per cryptocurrency platform (that gives us modules named bitcoin, ethereum, ripple, iota, heat, eos etc..).
+// address support is provided through these methods: 
+// - generateAddress
+// - getAddress
+// - isValidAddress
 
-While not mandated generally speaking each module provides the following high level cryptocurrency operations (in no particular order).
+function generateAddress() {
+  const api = new RippleAPI()
+  const {secret, address} = api.generateAddress();
+  const keypair = api.deriveKeypair(secret)
+  return {
+    publicKey: keypair.publicKey,
+    secret: secret,
+    address: address,
+  }
+}
 
-1. Determine if an address is a structurally valid address
-2. Determine if a private key is structurally valid
-3. Determine if a seed is an HD seed (as defined by that platform standard)
-4. Derive private keys from an HD seed
-5. Derive a public key from a private key
-6. Derive an address from a public key or private key
-7. Generate hd seeds or private keys
+function getAddress(secret) {
+  const api = new RippleAPI()
+  const keypair = api.deriveKeypair(secret)
+  const address = api.deriveAddress(keypair.publicKey)
+  return {
+    publicKey: keypair.publicKey,
+    address: address
+  }
+}
 
-Following behind these high level operations (shared amongst most modules) modules also expose fine grained more specific to their 
-cryptocurrency platform operations which are generally divided up into sub-protocols.
+function isValidAddress(address) {
+  const api = new RippleAPI()
+  return api.isValidAddress(address)
+}
 
-Examples of sub protocols are for instance.
+[... rest of code ...]
+```
 
-1. Ethereum: native ETH or GAS, erc20, erc223, erc721, erc621, erc827
-2. Bitcoin: legacy, lightning, segwit
-3. Stellar: native, 4 char asset, 12 char asset
-4. HEAT: native  HEAT, assets, asset exchange 
+Thats it! You have just completed implementing address support for Ripple.
 
-For each of these sub protocols we would expose the actions that can be performed (actions generally speaking are invoked by creating 
-binary transactions which can be broadcasted to the network). 
-Generally speaking this means that each sub protocol has a `transfer amount X to address Y` transaction. 
-Where needed other actions can be exposed.
+Now for the unit tests.. Open the file `./modules/ripple/test/address.spec.js` that was generated for you during the bootstrap step.
 
-Apart from generating these binary transactions it is highly desired that the modules can parse and confirm the binary transactions in order 
-to verify what we are broadcasting before we do so.
+`address.spec.js` is a [Jasmine](https://jasmine.github.io/) BDD test (visit the Jasmine page to learn more).
+
+The first two `tests` require no input from you and should pass. The third and fourth test we need to provide 
+with some actual valid and invalid addresses and secrets, we did so for you below.
+
+```js
+[... rest of code ...]
+
+    it("should support address validation", function () {
+      expect(isValidAddress('rLTH4Adi38RCRzWQiCAMGbH22VgQNJeX7C')).toBeTrue()
+      expect(isValidAddress('rUQikgSbpKfT2Yr9KRcevJtFEdpfHcZBZv')).toBeTrue()
+      expect(isValidAddress('zLTH4Adi38RCRzWQiCAMGbH22VgQNJeX7C')).toBeFalse()
+      expect(isValidAddress('rLTH4Adi38RCRzWQiMGbH22VgQNJeX7C')).toBeFalse()
+    })
+    it("should support secret validation", function () {
+      expect(getAddress("snu3s7NiW7FsN5Gq4FTSc2EX6D9zB").address).toBe('rsywaBeNiq88RGFsBPioVQhphb7XDEDJdR')
+      expect(getAddress("saf6SZAiUpkCdESFfb44TCqTGtQ7z").address).toBe('r4virxg35Ri71xWJjNpBh2q85c9uV6b7MP')
+      expect(() => getAddress("snu3s7NiW7FsN5Gq4FTSc2EX6D9z")).toThrowError("checksum_invalid")
+      expect(() => getAddress("snu3s7NiW7FsN5Gq4FTSc2EX6D9zB91")).toThrowError("checksum_invalid")
+    })
+
+[... rest of code ...]    
+```
+
+Run the test to see if all is working, address support for Ripple is complete.
+
+```shell
+npm run test-address
+```
+
+### Transaction support
+
+Now we add support for sending payments on the Ripple blockchain.
+
+Again open `./modules/ripple/src/core.js` and add the following code to add support for creating payments on the Ripple blockchain.
+
+```js
+async function createPayment(payment, instructions, secret) {
+  const api = new RippleAPI()
+  let sender = getAddress(secret)
+  let prepared = await api.preparePayment(sender.address, payment, instructions)
+  const { signedTransaction, id } = api.sign(prepared.txJSON, secret)
+  return {
+    signedTransaction, id, prepared
+  }
+}
+```
+
+Note that when it comes to transactions our implementation is not as generic as that for addresses. This fact is important and by design.
+
+Our aim here is to support not just sending payments, instead we aim to support the full depth of functionality for each separate blockchain in
+order to be able to use most of its features where needed.
+
+Now lets test our payment functionality.
+
+Open the file `./modules/ripple/test/transaction.spec.js` that was generated for you during the bootstrap step. And add the following code.
+
+```js
+describe("Test", function() {
+  const { createPayment } = window.exposer.exposedMethods
+  describe("Payment", function () {
+    it("can create payments", async function () {
+      let address = 'rsywaBeNiq88RGFsBPioVQhphb7XDEDJdR'
+      let secret = 'snu3s7NiW7FsN5Gq4FTSc2EX6D9zB'
+      let payment = {
+        source: {
+          address: address,
+          maxAmount: {
+            value: '0.01',
+            currency: 'XRP'
+          }
+        },
+        destination: {
+          address: 'r4virxg35Ri71xWJjNpBh2q85c9uV6b7MP',
+          amount: {
+            value: '0.01',
+            currency: 'XRP'
+          }
+        }      
+      }
+      let instructions = {
+        maxLedgerVersion: 8820051,
+        fee: '0.000012',
+        sequence: 1,
+        signersCount: 1
+      }
+      let data = await createPayment(payment, instructions, secret)
+      let txJSON = JSON.parse(data.prepared.txJSON)     
+      expect(txJSON.TransactionType).toBe('Payment')
+      expect(txJSON.Account).toBe('rsywaBeNiq88RGFsBPioVQhphb7XDEDJdR')
+      expect(txJSON.Destination).toBe('r4virxg35Ri71xWJjNpBh2q85c9uV6b7MP')
+      expect(txJSON.Amount).toBe('10000')
+    })
+  })
+})
+```
+
+Now run our test with `npm run test-transaction` to see if we succeeded in adding Ripple support.
