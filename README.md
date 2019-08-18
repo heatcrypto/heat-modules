@@ -148,7 +148,7 @@ Open the file [`./modules/ripple/test/transaction.spec.js`](https://github.com/H
 
 ```js
 describe("Test", function() {
-  const { createPayment } = window.exposer.exposedMethods
+  const { createPayment } = window.webview.exposedMethods
   describe("Payment", function () {
     it("can create payments", async function () {
       let address = 'rsywaBeNiq88RGFsBPioVQhphb7XDEDJdR'

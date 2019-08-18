@@ -112,7 +112,7 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/package.json`),
   "main": "index.js",
   "scripts": {
     "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && npm run babel",
-    "babel": "../../node_modules/.bin/babel ./bundle.js --presets minify --no-comments --out-file ./bundle.es5.js",
+    "babel": "../../node_modules/.bin/babel ./bundle.js --no-comments --out-file ./bundle.es5.js",
     "test": "../../node_modules/.bin/karma start ./karma.conf.js --single-run",
     "dist": "npm run build && npm run test && node ../html-wrap.js",
     "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
