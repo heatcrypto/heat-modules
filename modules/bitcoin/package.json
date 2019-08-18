@@ -1,7 +1,7 @@
 {
-  "name": "heat",
+  "name": "bitcoin",
   "version": "1.0.0",
-  "description": "heat blockchain protocol operations",
+  "description": "bitcoin blockchain protocol operations",
   "main": "index.js",
   "scripts": {
     "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && npm run babel",
@@ -15,6 +15,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "heat-sdk": "^2.1.0"
+    "bip32": "^2.0.3",
+    "bip39": "^3.0.2",
+    "bitcoinjs-lib": "^5.1.1",
+    "coinselect": "^3.1.11",
+    "lodash": "^4.17.11",
+    "safe-buffer": "^5.2.0"
   }
 }

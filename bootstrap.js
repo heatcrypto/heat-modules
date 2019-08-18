@@ -21,7 +21,7 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/src/core.js`),
   throw new Error('Not implemented')
 }
 
-function getAddress(secret) {
+function getAddress(privateKey, type) {
   throw new Error('Not implemented')
 }
 
@@ -42,7 +42,7 @@ module.exports = {
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/test/address.spec.js`), 
 `describe("Test", function() {
-  const { generateAddress, getAddress, isValidAddress } = window.exposer.exposedMethods
+  const { generateAddress, getAddress, isValidAddress } = window.webview.exposedMethods
   describe("Address", function () {
     let addr = generateAddress()
     it("should support address generation", function () {
@@ -65,7 +65,7 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/test/address.spec.js
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/test/transaction.spec.js`), 
 `describe("Test", function() {
-  const { createPayment } = window.exposer.exposedMethods
+  const { createPayment } = window.webview.exposedMethods
   describe("Payment", function () {
     it("can create payments", async function () {
       expect(() => createPayment()).toThrowError('Not implemented')
@@ -74,17 +74,7 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/test/transaction.spe
 })`)
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/index.js`), 
-`const { expose } = window.exposer = require('../expose')
-const { 
-  generateAddress,
-  getAddress,
-  isValidAddress,
-  createPayment } = require('./src/core')
-
-expose('generateAddress',generateAddress)
-expose('getAddress',getAddress)
-expose('isValidAddress',isValidAddress)
-expose('createPayment',createPayment)`)
+`require('../expose').exposeAll(require('./src/core'))`)
 
 await writeFile(path.join(__dirname, `modules/${moduleName}/karma.conf.js`), 
 `function getSpecs(specList) {
@@ -121,11 +111,13 @@ await writeFile(path.join(__dirname, `modules/${moduleName}/package.json`),
   "description": "${moduleName} blockchain protocol operations",
   "main": "index.js",
   "scripts": {
-    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js",
-    "test": "karma start ./karma.conf.js --single-run",
-    "dist": "npm run build && npm run test",
-    "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' karma start ./karma.conf.js --single-run",
-    "test-transaction": "npm run build && KARMA_SPECS='./test/transaction.spec.js' karma start ./karma.conf.js --single-run"
+    "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && npm run babel",
+    "babel": "../../node_modules/.bin/babel ./bundle.js --presets minify --no-comments --out-file ./bundle.es5.js",
+    "test": "../../node_modules/.bin/karma start ./karma.conf.js --single-run",
+    "dist": "npm run build && npm run test && node ../html-wrap.js",
+    "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
+    "test-transaction": "npm run build && KARMA_SPECS='./test/transaction.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
+    "test-core": "npm run build && KARMA_SPECS='./test/core.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run"
   },
   "author": "",
   "license": "ISC",
