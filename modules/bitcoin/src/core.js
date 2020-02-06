@@ -164,7 +164,7 @@ function doCoinSelect(utxos, targets, feeRate) {
   return coinSelect(utxos, targets, feeRate)
 }
 
-function coinSelectSplit(utxos, targets, feeRate) {
+function doCoinSelectSplit(utxos, targets, feeRate) {
   return coinSelectSplit(utxos, targets, feeRate)
 }
 
@@ -176,6 +176,6 @@ module.exports = {
   bip44BatchDeriveKeyPairs,
   create1to1Transaction,
   doCoinSelect,
-  coinSelectSplit,
+  doCoinSelectSplit,
   cashaddr
 }
