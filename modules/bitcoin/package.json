@@ -10,16 +10,19 @@
     "dist": "npm run build && npm run test && node ../html-wrap.js",
     "test-address": "npm run build && KARMA_SPECS='./test/address.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
     "test-transaction": "npm run build && KARMA_SPECS='./test/transaction.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
-    "test-core": "npm run build && KARMA_SPECS='./test/core.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run"
+    "test-core": "npm run build && KARMA_SPECS='./test/core.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run",
+    "test-bch": "npm run build && KARMA_SPECS='./test/bch.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@trezor/utxo-lib": "0.0.2",
+    "bchaddrjs": "^0.4.4",
     "bip32": "^2.0.3",
     "bip39": "^3.0.2",
     "bitcoinjs-lib": "^5.1.1",
     "coinselect": "^3.1.11",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "safe-buffer": "^5.2.0"
   }
 }

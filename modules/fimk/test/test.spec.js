@@ -1,10 +1,20 @@
 describe("Test", function() {
   const { getAddress,
     isValidAddress,
-    transferHeat,
-    transferAsset } = window.webview.exposedMethods
+    transferFimk,
+    transferAsset,
+    toRSAddress,
+    toNumericAddress } = window.webview.exposedMethods
+  it("should support 'toRSAddress'", function () {
+    expect(toRSAddress('11201384877209115915')).toBe('FIM-QRAD-8D59-288R-BJUWQ')
+    expect(toRSAddress('FIM-QRAD-8D59-288R-BJUWQ')).toBe('FIM-QRAD-8D59-288R-BJUWQ')
+  })    
+  it("should support 'toNumericAddress'", function () {
+    expect(toNumericAddress('FIM-QRAD-8D59-288R-BJUWQ')).toBe('11201384877209115915')
+    expect(toNumericAddress('11201384877209115915')).toBe('11201384877209115915')
+  })   
   it("should support 'isValidAddress'", function () {
-    expect(isValidAddress('123')).toBeTrue()
+    expect(isValidAddress('11201384877209115915')).toBeTrue()
     expect(isValidAddress('000')).toBeFalse()
     expect(isValidAddress('abc')).toBeFalse()
   })
@@ -12,17 +22,17 @@ describe("Test", function() {
     expect(getAddress('2420e62e204d37554b3a1463ee6d2fe87133053877f51591e0b9c98ab9fd993e')).toBe('11201384877209115915')
     expect(getAddress('15c33fe460045abee529918c862322bc83ebbc297152395882b52fa723eef163')).toBe('11740260613755006687')
   })  
-  it("should support 'transferHeat'", async function () {
+  it("should support 'transferFimk'", async function () {
     let key = 'privatekey', 
       recipientAddress = '1234', 
       recipientPublicKey = null, 
       amount = '10000000', 
-      fee = '1000000', 
-      networkType = 'test', 
+      fee = '1000000',
+      timestamp = 10000000000, 
       message = null, 
-      messageIsPrivate = false, 
+      messageIsPrivate = true, 
       messageIsBinary = false;
-    let bytes = await transferHeat(key, recipientAddress, recipientPublicKey, amount, fee, networkType, message, messageIsPrivate, messageIsBinary)
+    let bytes = await transferFimk(key, recipientAddress, recipientPublicKey, amount, fee, timestamp, message, messageIsPrivate, messageIsBinary)
     expect(bytes).toBeString();
     console.log(bytes)
   })    
@@ -32,12 +42,12 @@ describe("Test", function() {
       recipientPublicKey = null, 
       amount = '10000000', 
       fee = '1000000', 
-      networkType = 'test', 
+      timestamp = 10000000000, 
       asset = '111111111',
       message = null, 
-      messageIsPrivate = false, 
+      messageIsPrivate = true, 
       messageIsBinary = false;
-    let bytes = await transferAsset(key, recipientAddress, recipientPublicKey, amount, fee, networkType, asset, message, messageIsPrivate, messageIsBinary)
+    let bytes = await transferAsset(key, recipientAddress, recipientPublicKey, amount, fee, timestamp, asset, message, messageIsPrivate, messageIsBinary)
     expect(bytes).toBeString();
     console.log(bytes)
   })  

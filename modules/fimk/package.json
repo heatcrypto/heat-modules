@@ -1,18 +1,19 @@
 {
-  "name": "heat",
+  "name": "fimk",
   "version": "1.0.0",
-  "description": "heat blockchain protocol operations",
+  "description": "fimk blockchain protocol operations",
   "main": "index.js",
   "scripts": {
     "build": "../../node_modules/.bin/browserify ./index.js > ./bundle.js && npm run babel",
     "babel": "../../node_modules/.bin/babel ./bundle.js --no-comments --out-file ./bundle.es5.js",
     "test": "../../node_modules/.bin/karma start ./karma.conf.js --single-run",
     "dist": "npm run build && npm run test && node ../html-wrap.js",
-    "test-core": "npm run build && KARMA_SPECS='./test/core.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run"
+    "test-core": "npm run build && KARMA_SPECS='./test/test.spec.js' ../../node_modules/.bin/karma start ./karma.conf.js --single-run"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "heat-sdk": "^2.1.0"
+    "lodash": "^4.17.11",
+    "fimk-sdk": "dmdeklerk/fimk-sdk#master"
   }
 }

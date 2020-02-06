@@ -1,29 +1,22 @@
-const bitcoin = require("bitcoinjs-lib")
+const _ = require('lodash')
+const bitcoin = require('@trezor/utxo-lib')
 const bip39 = require("bip39")
 const bip32 = require("bip32")
 const coinSelect = require('coinselect')
+const coinSelectSplit = require('coinselect/split')
 const Buffer = require('safe-buffer').Buffer
+const cashaddr = require('bchaddrjs')
 
-function ECPairFromPrivateKey(privateKeyHex) {
-  var keyPair = bitcoin.ECPair.fromPrivateKey(Buffer.from(privateKeyHex,'hex'));
-  return {
-    privateKey: keyPair.privateKey.toString('hex'),
-    publicKey: keyPair.publicKey.toString('hex'),
-    wif: keyPair.toWIF()
-  }
-}
+// So we need to always use the proper network when dealing with keys and addresses
+// https://github.com/bitcoinjs/bitcoinjs-lib/issues/1223
+// https://en.bitcoin.it/wiki/List_of_address_prefixes
 
-function ECPairFromWif(wifString) {
-  var keyPair = bitcoin.ECPair.fromWIF(wifString);
-  return {
-    publicKey: keyPair.publicKey.toString('hex'),
-    wif: keyPair.toWIF()
-  }  
-}
+function getAddress(privateKey, type, networkId) {
+  const network = bitcoin.networks[networkId];
+  if (_.isUndefined(network)) throw new Error(`network not supported [${networkId}] supported networks [${Object.keys(bitcoin.networks).join(',')}]`);
+  if (!_.isString(privateKey)) throw new Error('Private key not a string');
 
-function getAddress(privateKey, type) {
-  var keyPair = bitcoin.ECPair.fromPrivateKey(Buffer.from(privateKey,'hex'));
-  console.log('keyPair',keyPair)
+  var keyPair = bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(privateKey,'hex'), network);
   switch (type) {
     // // multi sig 1:1 
     // case 'p2sh': {
@@ -33,7 +26,7 @@ function getAddress(privateKey, type) {
     // }
     // standard pay to public key hash
     case 'p2pkh': {
-      const { address } = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey });
+      const address = keyPair.getAddress()
       return address;
     }
     // // segwit (lightning address)
@@ -45,9 +38,15 @@ function getAddress(privateKey, type) {
   throw new Error('Unsupported address type');
 }
 
-function isValidAddress(address, type) {
+function isValidAddress(address, networkId) {
+  const network = bitcoin.networks[networkId];
+  if (_.isUndefined(network)) throw new Error(`network not supported [${networkId}] supported networks [${Object.keys(bitcoin.networks).join(',')}]`);
+  if (!_.isString(address)) throw new Error('Private key not a string');
   try {
-    bitcoin.address.toOutputScript(address)
+    if (networkId == 'bitcoincash') {
+      address = cashaddr.toLegacyAddress(address)
+    }    
+    bitcoin.address.toOutputScript(address, network)
     return true
   } catch (e) {
     return false
@@ -84,12 +83,99 @@ function bip44BatchDeriveKeyPairs(mnemonic, paths) {
   return result
 }
 
+const SIGHASH_ALL = 0x01
+const SIGHASH_BITCOINCASHBIP143 = 0x40
+
+/**
+ * Creates a 1-to-1 transaction to an address. Returns the transaction as Hex
+ * 
+ * @param {Array<{
+ *   vout:number,
+ *   txId:string,
+ *   privateKey:string,
+ *   sequence: number,
+ *   scriptSig:string
+ * }>} inputs 
+ * @param {Array<{
+ *   address:string,
+ *   value:number
+ * }>} outputs 
+ * @returns {String}
+ */
+function create1to1Transaction(inputs, outputs, networkId) {
+  const network = bitcoin.networks[networkId];
+  if (_.isUndefined(network)) throw new Error(`network not supported [${networkId}] supported networks [${Object.keys(bitcoin.networks).join(',')}]`);
+  const txb = new bitcoin.TransactionBuilder(network)
+
+  // adds a 'keyPair':ECPair to each input
+  inputs.forEach(input => {
+    if (!_.isString(input.privateKey)) throw new Error('Private key not a string');
+    input.keyPair = bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(input.privateKey,'hex'), network);
+  });
+
+  // add all inputs to the builder
+  inputs.forEach(input => {
+    txb.addInput(input.txId, input.vout)
+  });
+
+  // add all outputs to the builder
+  outputs.forEach(output => {
+    let address = output.address
+    if (networkId == 'bitcoincash') {
+      address = cashaddr.toLegacyAddress(address)
+    }
+    txb.addOutput(address, output.value)
+  });
+
+  // sign all inputs
+  inputs.forEach((input,index) => {
+    let hashType;
+    if (networkId == 'bitcoincash') {
+      hashType = SIGHASH_ALL | SIGHASH_BITCOINCASHBIP143
+    }
+    txb.sign(index, input.keyPair,  undefined, hashType, input.value)
+  })
+  return txb.build().toHex()
+}
+
+/**
+ * Select utxos and outputs.
+ * 
+ * @param {Array<{
+ *   txId: string,
+ *   vout: number,
+ *   value: number
+ * }>} utxos 
+ * @param {Array<{
+ *   address: string,
+ *   value: number
+ * }>} targets 
+ * @param {number} feeRate 
+ * @returns {{
+ *   inputs:[],
+ *   outputs: Array<{
+ *     address: string|false|null, // if no address we must provide a change address
+ *     value: number
+ *   }>, 
+ *   fee: number // total fee
+ * }}
+ */
+function doCoinSelect(utxos, targets, feeRate) {
+  return coinSelect(utxos, targets, feeRate)
+}
+
+function coinSelectSplit(utxos, targets, feeRate) {
+  return coinSelectSplit(utxos, targets, feeRate)
+}
+
 module.exports = {
   getAddress,
   isValidAddress,
   bip39GenerateMnemonic,
   bip39ValidateMnemonic,
   bip44BatchDeriveKeyPairs,
-  ECPairFromPrivateKey,
-  ECPairFromWif
+  create1to1Transaction,
+  doCoinSelect,
+  coinSelectSplit,
+  cashaddr
 }
