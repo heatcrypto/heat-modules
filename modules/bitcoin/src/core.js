@@ -12,17 +12,16 @@ const cashaddr = require('bchaddrjs')
 // https://en.bitcoin.it/wiki/List_of_address_prefixes
 
 function isHex(h) {
-  var a = parseInt(h, 16);
-  return (a.toString(16) === h.toLowerCase())
+  return Boolean(h.match(/^[0-9a-f]+$/i))
 }
 
-function getAddress(privateKey, type, networkId) {
+function getAddress(privateKeyOrWif, type, networkId) {
   const network = bitcoin.networks[networkId];
   if (_.isUndefined(network)) throw new Error(`network not supported [${networkId}] supported networks [${Object.keys(bitcoin.networks).join(',')}]`);
-  if (!_.isString(privateKey)) throw new Error('Private key not a string');
+  if (!_.isString(privateKeyOrWif)) throw new Error('Private key not a string');
 
-  var keyPair = isHex(privateKey) ? 
-    bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(privateKey, 'hex'), network) : 
+  var keyPair = isHex(privateKeyOrWif) ? 
+    bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(privateKeyOrWif, 'hex'), network) : 
     bitcoin.ECPair.fromWIF(privateKeyOrWif, network);
   switch (type) {
     // // multi sig 1:1 
@@ -117,7 +116,9 @@ function create1to1Transaction(inputs, outputs, networkId) {
   // adds a 'keyPair':ECPair to each input
   inputs.forEach(input => {
     if (!_.isString(input.privateKey)) throw new Error('Private key not a string');
-    input.keyPair = bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(input.privateKey, 'hex'), network);
+    input.keyPair = isHex(input.privateKey) ?
+      bitcoin.ECPair.fromPrivateKeyBuffer(Buffer.from(input.privateKey, 'hex'), network) :
+      bitcoin.ECPair.fromWIF(input.privateKey, network);
   });
 
   // add all inputs to the builder
