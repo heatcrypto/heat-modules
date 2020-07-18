@@ -20,7 +20,7 @@
     "bitcoinjs-lib": "^5.1.1",
     "coinselect": "^3.1.11",
     "ethers": "^4.0.42",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "safe-buffer": "^5.2.0",
     "web3": "^1.2.0"
   }
