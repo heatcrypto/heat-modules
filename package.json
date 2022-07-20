@@ -33,7 +33,7 @@
     "prettier": "1.18.2",
     "puppeteer": "^1.12.2",
     "subpackage": "^1.1.0",
-    "terser": "^3.16.1",
+    "terser": "^4.8.1",
     "uglify-js": "^3.6.0",
     "write": "^1.0.3"
   },
